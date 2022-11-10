@@ -1,88 +1,90 @@
-import { extend, useFrame, useLoader, useThree } from "@react-three/fiber";
+import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
-import { OrbitControls, TransformControls } from "@react-three/drei";
+import { OrbitControls, TransformControls, useCursor } from "@react-three/drei";
 import { useControls } from "leva";
-import { Noise, Pixelation, EffectComposer } from "@react-three/postprocessing";
-import { BlendFunction } from "postprocessing";
 
-import { MathUtils, TextureLoader } from "three";
+import { MathUtils, TextureLoader, DoubleSide } from "three";
 
 export default function Experience() {
   const [displayMap, setDisplayMap] = useState(false);
+  const [hovered, setHovered] = useState();
   const planeRef = useRef();
   const planeRefToShow = useRef();
-  const pixelEffect = useRef();
+  const planeLeft = useRef();
+  const planeRight = useRef();
+  const groupLeft = useRef();
+
+  useCursor(hovered /*'pointer', 'auto'*/);
 
   const maraudersMapHidden = useLoader(
     TextureLoader,
     "assets/marauders-map-hidden.png"
   );
   const maraudersMapShow = useLoader(TextureLoader, "assets/marauders-map.jpg");
+  const maraudersMapCenter = useLoader(
+    TextureLoader,
+    "assets/marauders-center.jpg"
+  );
+  const maraudersMapLeft = useLoader(
+    TextureLoader,
+    "assets/marauders-left.jpg"
+  );
+  const maraudersMapRight = useLoader(
+    TextureLoader,
+    "assets/marauders-right.jpg"
+  );
 
-  const { position } = useControls({
-    position: {
-      value: { x: 0, y: 0, z: 1.3 },
-      step: 0.01,
-    },
-  });
+  // const { position } = useControls({
+  //   position: {
+  //     value: { x: 0, y: 0, z: 1.3 },
+  //     step: 0.01,
+  //   },
+  // });
 
   const clickMapHandler = () => {
+    console.log("error");
+    planeRef.current.position.z = 0;
     setDisplayMap(true);
-    planeRef.current.material.transparent = "true";
-    // pixelEffect.current.granularity = 3;
+    // planeRef.current.material.transparent = "true";
   };
 
   useFrame((state, delta) => {
-    if (displayMap && planeRefToShow.current.material.opacity < 1) {
-      // Fade in the map using the clock
-      console.log("change opcaity");
-      //   pixelEffect.current.granularity -= delta * 0.3;
-      planeRefToShow.current.material.opacity += delta * 0.3;
-      planeRef.current.material.opacity -= delta * 0.3;
+    if (displayMap && groupLeft.current.rotation.y > -Math.PI) {
+      // planeRefToShow.current.material.opacity += delta * 0.3;
+      // planeRef.current.material.opacity -= delta * 0.3;
+      groupLeft.current.rotation.y -= delta;
     }
   });
 
   return (
     <>
       <OrbitControls />
-      {/* <mesh scale={[1, 1, 1]} position-x={-2}>
-        <sphereGeometry />
-        <meshBasicMaterial color="orange" wireframe />
-      </mesh>
-      <mesh ref={cubeRef} position-x={2}>
-        <boxGeometry />
-        <meshBasicMaterial color="mediumpurple" wireframe />
-      </mesh> */}
-      <mesh
-        onClick={clickMapHandler}
-        position={[position.x, position.y, position.z]}
-        ref={planeRef}
-        scale={6}
-      >
+
+      <mesh ref={planeRef} scale={[1, 2, 0]} position-z={-0.01}>
         <planeGeometry />
-        <meshBasicMaterial map={maraudersMapHidden} />
+        <meshBasicMaterial map={maraudersMapCenter} />
       </mesh>
-
-      {/* <EffectComposer>
-        <Pixelation
-          ref={pixelEffect}
-          granularity={0} // pixel granularity
-        />
-      </EffectComposer> */}
-
-      <mesh
-        position={[position.x, position.y, position.z]}
-        ref={planeRefToShow}
-        scale={6}
-      >
+      <group ref={groupLeft} position-x={-0.5}>
+        <mesh
+          onPointerOver={() => setHovered(true)}
+          onPointerOut={() => setHovered(false)}
+          onClick={clickMapHandler}
+          ref={planeLeft}
+          position-x={0.5}
+          scale={[1, 2, 0.01]}
+        >
+          <planeGeometry />
+          <meshBasicMaterial side={DoubleSide} map={maraudersMapLeft} />
+        </mesh>
+      </group>
+      {/* <mesh ref={planeRefToShow} scale={6}>
         <planeGeometry />
         <meshBasicMaterial
           transparent="true"
           opacity={0}
           map={maraudersMapShow}
         />
-      </mesh>
-
+      </mesh> */}
       {/* <TransformControls object={planeRef} /> */}
     </>
   );
