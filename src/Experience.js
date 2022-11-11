@@ -1,89 +1,160 @@
-import { extend, useFrame, useLoader, useThree } from "@react-three/fiber";
-import { useEffect, useRef, useState } from "react";
-import { OrbitControls, TransformControls } from "@react-three/drei";
+import { useFrame, useLoader } from "@react-three/fiber";
+import { useRef, useState } from "react";
+import { OrbitControls, TransformControls, useCursor } from "@react-three/drei";
 import { useControls } from "leva";
-import { Noise, Pixelation, EffectComposer } from "@react-three/postprocessing";
-import { BlendFunction } from "postprocessing";
 
-import { MathUtils, TextureLoader } from "three";
+import { TextureLoader, DoubleSide } from "three";
 
 export default function Experience() {
   const [displayMap, setDisplayMap] = useState(false);
+  const [leftSideOpened, setLeftSideOpened] = useState(false);
+  const [rightSideOpened, setRightSideOpened] = useState(false);
+  const [hovered, setHovered] = useState();
+
   const planeRef = useRef();
-  const planeRefToShow = useRef();
-  const pixelEffect = useRef();
 
-  const maraudersMapHidden = useLoader(
+  const groupRight = useRef();
+  const planeRightHidden = useRef();
+  const planeRightVisible = useRef();
+
+  const groupLeft = useRef();
+  const planeLeftHidden = useRef();
+  const planeLeftVisible = useRef();
+
+  useCursor(hovered /*'pointer', 'auto'*/);
+
+  const mapLeftVisible = useLoader(
     TextureLoader,
-    "assets/marauders-map-hidden.png"
+    "assets/map/map-left-visible.jpg"
   );
-  const maraudersMapShow = useLoader(TextureLoader, "assets/marauders-map.jpg");
 
-  const { position } = useControls({
-    position: {
-      value: { x: 0, y: 0, z: 1.3 },
-      step: 0.01,
-    },
-  });
+  const mapRightVisible = useLoader(
+    TextureLoader,
+    "assets/map/map-right-visible.jpg"
+  );
+
+  const maraudersMapCenter = useLoader(
+    TextureLoader,
+    "assets/map/map-center.jpg"
+  );
+  const maraudersMapLeft = useLoader(
+    TextureLoader,
+    "assets/map/map-left-hidden.jpg"
+  );
+  const maraudersMapRight = useLoader(
+    TextureLoader,
+    "assets/map/map-right-hidden.jpg"
+  );
+
+  // const { position } = useControls({
+  //   position: {
+  //     value: { x: 0, y: 0, z: 1.3 },
+  //     step: 0.01,
+  //   },
+  // });
 
   const clickMapHandler = () => {
+    planeRef.current.position.z = 0;
     setDisplayMap(true);
-    planeRef.current.material.transparent = "true";
-    // pixelEffect.current.granularity = 3;
   };
 
   useFrame((state, delta) => {
-    if (displayMap && planeRefToShow.current.material.opacity < 1) {
-      // Fade in the map using the clock
-      console.log("change opcaity");
-      //   pixelEffect.current.granularity -= delta * 0.3;
-      planeRefToShow.current.material.opacity += delta * 0.3;
-      planeRef.current.material.opacity -= delta * 0.3;
+    // First left side animation
+    if (displayMap && groupLeft.current.rotation.y > -Math.PI) {
+      groupLeft.current.rotation.y -= delta * 2;
+    } else if (displayMap && groupLeft.current.rotation.y <= -Math.PI) {
+      setLeftSideOpened(true);
+    }
+
+    // If left side animation done, start the right side animation
+    if (leftSideOpened && groupRight.current.rotation.y < Math.PI) {
+      groupRight.current.rotation.y += delta * 2;
+    } else if (leftSideOpened && groupRight.current.rotation.y >= Math.PI) {
+      setRightSideOpened(true);
+    }
+
+    // When both sides are opened, start the fade in map animation
+    if (
+      rightSideOpened & leftSideOpened &&
+      planeRightVisible.current.material.opacity < 1
+    ) {
+      planeLeftVisible.current.material.opacity += delta * 0.3;
+      planeRightVisible.current.material.opacity += delta * 0.3;
+
+      planeLeftHidden.current.material.opacity -= delta * 0.3;
+      planeRightHidden.current.material.opacity -= delta * 0.3;
+    } else if (
+      rightSideOpened & leftSideOpened &&
+      planeRightVisible.current.material.opacity >= 1
+    ) {
+      planeLeftHidden.current.visible = false;
+      planeRightHidden.current.visible = false;
     }
   });
 
   return (
     <>
       <OrbitControls />
-      {/* <mesh scale={[1, 1, 1]} position-x={-2}>
-        <sphereGeometry />
-        <meshBasicMaterial color="orange" wireframe />
-      </mesh>
-      <mesh ref={cubeRef} position-x={2}>
-        <boxGeometry />
-        <meshBasicMaterial color="mediumpurple" wireframe />
-      </mesh> */}
-      <mesh
-        onClick={clickMapHandler}
-        position={[position.x, position.y, position.z]}
-        ref={planeRef}
-        scale={6}
-      >
+
+      <mesh ref={planeRef} scale={[1, 2, 0]} position-z={-0.01}>
         <planeGeometry />
-        <meshBasicMaterial map={maraudersMapHidden} />
+        <meshBasicMaterial map={maraudersMapCenter} />
       </mesh>
-
-      {/* <EffectComposer>
-        <Pixelation
-          ref={pixelEffect}
-          granularity={0} // pixel granularity
-        />
-      </EffectComposer> */}
+      <group ref={groupLeft} position-x={-0.5}>
+        <mesh
+          onPointerOver={() => setHovered(true)}
+          onPointerOut={() => setHovered(false)}
+          onClick={clickMapHandler}
+          ref={planeLeftHidden}
+          position-x={0.5}
+          scale={[1, 2, 0.01]}
+          rotation-z={Math.PI}
+        >
+          <planeGeometry />
+          <meshBasicMaterial side={DoubleSide} map={maraudersMapLeft} />
+        </mesh>
+      </group>
 
       <mesh
-        position={[position.x, position.y, position.z]}
-        ref={planeRefToShow}
-        scale={6}
+        ref={planeLeftVisible}
+        position-x={-1}
+        scale={[1, 2, 0.05]}
+        rotation-z={Math.PI}
       >
         <planeGeometry />
         <meshBasicMaterial
+          map={mapLeftVisible}
           transparent="true"
           opacity={0}
-          map={maraudersMapShow}
         />
       </mesh>
 
-      {/* <TransformControls object={planeRef} /> */}
+      <group ref={groupRight} position-x={0.5}>
+        <mesh
+          ref={planeRightHidden}
+          position-x={-0.5}
+          scale={[1, 2, 0]}
+          rotation-z={Math.PI}
+          transparent="true"
+        >
+          <planeGeometry />
+          <meshBasicMaterial side={DoubleSide} map={maraudersMapRight} />
+        </mesh>
+      </group>
+
+      <mesh
+        ref={planeRightVisible}
+        position-x={1}
+        scale={[1, 2, 0]}
+        rotation-z={Math.PI}
+      >
+        <planeGeometry />
+        <meshBasicMaterial
+          map={mapRightVisible}
+          transparent="true"
+          opacity={0}
+        />
+      </mesh>
     </>
   );
 }
