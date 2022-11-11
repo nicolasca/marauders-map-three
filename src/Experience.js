@@ -1,9 +1,9 @@
-import { useFrame, useLoader, useThree } from "@react-three/fiber";
-import { useEffect, useRef, useState } from "react";
+import { useFrame, useLoader } from "@react-three/fiber";
+import { useRef, useState } from "react";
 import { OrbitControls, TransformControls, useCursor } from "@react-three/drei";
 import { useControls } from "leva";
 
-import { MathUtils, TextureLoader, DoubleSide } from "three";
+import { TextureLoader, DoubleSide } from "three";
 
 export default function Experience() {
   const [displayMap, setDisplayMap] = useState(false);
@@ -25,26 +25,25 @@ export default function Experience() {
 
   const mapLeftVisible = useLoader(
     TextureLoader,
-    "assets/map-left-visible.jpg"
+    "assets/map/map-left-visible.jpg"
   );
 
   const mapRightVisible = useLoader(
     TextureLoader,
-    "assets/map-right-visible.jpg"
+    "assets/map/map-right-visible.jpg"
   );
 
-  const maraudersMapShow = useLoader(TextureLoader, "assets/marauders-map.jpg");
   const maraudersMapCenter = useLoader(
     TextureLoader,
-    "assets/marauders-center.jpg"
+    "assets/map/map-center.jpg"
   );
   const maraudersMapLeft = useLoader(
     TextureLoader,
-    "assets/marauders-left.jpg"
+    "assets/map/map-left-hidden.jpg"
   );
   const maraudersMapRight = useLoader(
     TextureLoader,
-    "assets/marauders-right.jpg"
+    "assets/map/map-right-hidden.jpg"
   );
 
   // const { position } = useControls({
@@ -139,7 +138,7 @@ export default function Experience() {
           transparent="true"
         >
           <planeGeometry />
-          <meshBasicMaterial side={DoubleSide} map={maraudersMapLeft} />
+          <meshBasicMaterial side={DoubleSide} map={maraudersMapRight} />
         </mesh>
       </group>
 
