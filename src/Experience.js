@@ -4,9 +4,14 @@ import { OrbitControls, TransformControls, useCursor } from "@react-three/drei";
 import { useControls } from "leva";
 
 import { TextureLoader, DoubleSide } from "three";
+import { FootPrint } from "./FootPrint";
+
+const HEIGHT_SIZE = 10;
+const WIDTH_SIZE = 5;
 
 export default function Experience() {
   const [displayMap, setDisplayMap] = useState(false);
+  const [isOpeningOver, setOpeningOver] = useState(false);
   const [leftSideOpened, setLeftSideOpened] = useState(false);
   const [rightSideOpened, setRightSideOpened] = useState(false);
   const [hovered, setHovered] = useState();
@@ -27,6 +32,7 @@ export default function Experience() {
     TextureLoader,
     "assets/map/map-left-visible.jpg"
   );
+  const leftHeight = useLoader(TextureLoader, "assets/map/left-height.png");
 
   const mapRightVisible = useLoader(
     TextureLoader,
@@ -41,6 +47,7 @@ export default function Experience() {
     TextureLoader,
     "assets/map/map-left-hidden.jpg"
   );
+
   const maraudersMapRight = useLoader(
     TextureLoader,
     "assets/map/map-right-hidden.jpg"
@@ -54,6 +61,7 @@ export default function Experience() {
   // });
 
   const clickMapHandler = () => {
+    console.log("still here");
     planeRef.current.position.z = 0;
     setDisplayMap(true);
   };
@@ -87,8 +95,9 @@ export default function Experience() {
       rightSideOpened & leftSideOpened &&
       planeRightVisible.current.material.opacity >= 1
     ) {
-      planeLeftHidden.current.visible = false;
+      planeLeftHidden.current.remove();
       planeRightHidden.current.visible = false;
+      setOpeningOver(true);
     }
   });
 
@@ -96,44 +105,52 @@ export default function Experience() {
     <>
       <OrbitControls />
 
-      <mesh ref={planeRef} scale={[1, 2, 0]} position-z={-0.01}>
+      <mesh
+        ref={planeRef}
+        scale={[WIDTH_SIZE, HEIGHT_SIZE, 0]}
+        position-z={-0.01}
+      >
         <planeGeometry />
         <meshBasicMaterial map={maraudersMapCenter} />
       </mesh>
-      <group ref={groupLeft} position-x={-0.5}>
+      <group ref={groupLeft} position-x={-WIDTH_SIZE / 2}>
         <mesh
           onPointerOver={() => setHovered(true)}
           onPointerOut={() => setHovered(false)}
           onClick={clickMapHandler}
           ref={planeLeftHidden}
-          position-x={0.5}
-          scale={[1, 2, 0.01]}
-          rotation-z={Math.PI}
+          position-x={WIDTH_SIZE / 2}
+          scale={[WIDTH_SIZE, HEIGHT_SIZE, 0.01]}
         >
           <planeGeometry />
-          <meshBasicMaterial side={DoubleSide} map={maraudersMapLeft} />
+          <meshStandardMaterial
+            attach="material"
+            transparent="true"
+            map={mapLeftVisible}
+          />
         </mesh>
       </group>
 
       <mesh
         ref={planeLeftVisible}
-        position-x={-1}
-        scale={[1, 2, 0.05]}
+        position-x={-WIDTH_SIZE}
+        scale={[WIDTH_SIZE, HEIGHT_SIZE, 0.05]}
         rotation-z={Math.PI}
       >
         <planeGeometry />
-        <meshBasicMaterial
+        <meshStandardMaterial
           map={mapLeftVisible}
+          displacementMap={leftHeight}
           transparent="true"
           opacity={0}
         />
       </mesh>
 
-      <group ref={groupRight} position-x={0.5}>
+      <group ref={groupRight} position-x={WIDTH_SIZE / 2}>
         <mesh
           ref={planeRightHidden}
-          position-x={-0.5}
-          scale={[1, 2, 0]}
+          position-x={-WIDTH_SIZE / 2}
+          scale={[WIDTH_SIZE, HEIGHT_SIZE, 0]}
           rotation-z={Math.PI}
           transparent="true"
         >
@@ -144,8 +161,8 @@ export default function Experience() {
 
       <mesh
         ref={planeRightVisible}
-        position-x={1}
-        scale={[1, 2, 0]}
+        position-x={WIDTH_SIZE}
+        scale={[WIDTH_SIZE, HEIGHT_SIZE, 0]}
         rotation-z={Math.PI}
       >
         <planeGeometry />
@@ -155,6 +172,13 @@ export default function Experience() {
           opacity={0}
         />
       </mesh>
+
+      {/* {isOpeningOver && (
+        <FootPrint
+          pathLeftTexture="assets/footprint/footprint-left.png"
+          pathRightTexture="assets/footprint/footprint-right.png"
+        />
+      )} */}
     </>
   );
 }
