@@ -103,82 +103,85 @@ export default function Experience() {
 
   return (
     <>
-      <OrbitControls />
+      <group position-y={-1}>
+        <OrbitControls makeDefault />
 
-      <mesh
-        ref={planeRef}
-        scale={[WIDTH_SIZE, HEIGHT_SIZE, 0]}
-        position-z={-0.01}
-      >
-        <planeGeometry />
-        <meshBasicMaterial map={maraudersMapCenter} />
-      </mesh>
-      <group ref={groupLeft} position-x={-WIDTH_SIZE / 2}>
         <mesh
-          onPointerOver={() => setHovered(true)}
-          onPointerOut={() => setHovered(false)}
-          onClick={clickMapHandler}
-          ref={planeLeftHidden}
-          position-x={WIDTH_SIZE / 2}
-          scale={[WIDTH_SIZE, HEIGHT_SIZE, 0.01]}
+          ref={planeRef}
+          scale={[WIDTH_SIZE, HEIGHT_SIZE, 0]}
+          position-z={-0.01}
+        >
+          <planeGeometry />
+          <meshBasicMaterial map={maraudersMapCenter} />
+        </mesh>
+        <group ref={groupLeft} position-x={-WIDTH_SIZE / 2}>
+          <mesh
+            onPointerOver={() => setHovered(true)}
+            onPointerOut={() => setHovered(false)}
+            onClick={clickMapHandler}
+            ref={planeLeftHidden}
+            position-x={WIDTH_SIZE / 2}
+            scale={[WIDTH_SIZE, HEIGHT_SIZE, 0.01]}
+          >
+            <planeGeometry />
+            <meshStandardMaterial
+              attach="material"
+              transparent="true"
+              side={DoubleSide}
+              map={maraudersMapLeft}
+            />
+          </mesh>
+        </group>
+
+        <mesh
+          ref={planeLeftVisible}
+          position-x={-WIDTH_SIZE}
+          scale={[WIDTH_SIZE, HEIGHT_SIZE, 0.05]}
+          rotation-z={Math.PI}
         >
           <planeGeometry />
           <meshStandardMaterial
-            attach="material"
-            transparent="true"
             map={mapLeftVisible}
+            displacementMap={leftHeight}
+            transparent="true"
+            opacity={0}
           />
         </mesh>
-      </group>
 
-      <mesh
-        ref={planeLeftVisible}
-        position-x={-WIDTH_SIZE}
-        scale={[WIDTH_SIZE, HEIGHT_SIZE, 0.05]}
-        rotation-z={Math.PI}
-      >
-        <planeGeometry />
-        <meshStandardMaterial
-          map={mapLeftVisible}
-          displacementMap={leftHeight}
-          transparent="true"
-          opacity={0}
-        />
-      </mesh>
+        <group ref={groupRight} position-x={WIDTH_SIZE / 2}>
+          <mesh
+            ref={planeRightHidden}
+            position-x={-WIDTH_SIZE / 2}
+            scale={[WIDTH_SIZE, HEIGHT_SIZE, 0]}
+            rotation-z={Math.PI}
+            transparent="true"
+          >
+            <planeGeometry />
+            <meshBasicMaterial side={DoubleSide} map={maraudersMapRight} />
+          </mesh>
+        </group>
 
-      <group ref={groupRight} position-x={WIDTH_SIZE / 2}>
         <mesh
-          ref={planeRightHidden}
-          position-x={-WIDTH_SIZE / 2}
+          ref={planeRightVisible}
+          position-x={WIDTH_SIZE}
           scale={[WIDTH_SIZE, HEIGHT_SIZE, 0]}
           rotation-z={Math.PI}
-          transparent="true"
         >
           <planeGeometry />
-          <meshBasicMaterial side={DoubleSide} map={maraudersMapRight} />
+          <meshBasicMaterial
+            map={mapRightVisible}
+            transparent="true"
+            opacity={0}
+          />
         </mesh>
-      </group>
 
-      <mesh
-        ref={planeRightVisible}
-        position-x={WIDTH_SIZE}
-        scale={[WIDTH_SIZE, HEIGHT_SIZE, 0]}
-        rotation-z={Math.PI}
-      >
-        <planeGeometry />
-        <meshBasicMaterial
-          map={mapRightVisible}
-          transparent="true"
-          opacity={0}
-        />
-      </mesh>
-
-      {/* {isOpeningOver && (
+        {/* {isOpeningOver && (
         <FootPrint
           pathLeftTexture="assets/footprint/footprint-left.png"
           pathRightTexture="assets/footprint/footprint-right.png"
         />
       )} */}
+      </group>
     </>
   );
 }

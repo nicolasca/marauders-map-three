@@ -11,9 +11,7 @@ function animateFootPrint(obj, deltaTime) {
     obj.isAppearing = false;
   } else if (obj.currentTimeAnimation <= 0 && !obj.isAppearing) {
     obj.isAppearing = true;
-    console.log(obj.name, obj.position.y);
     obj.position.y += (FOOTSTEP_ANIMATION_SPEED * 2) / 30;
-    console.log(obj.name, obj.position.y);
   }
 
   obj.currentTimeAnimation = obj.isAppearing
@@ -66,7 +64,7 @@ export const FootPrint = ({ pathLeftTexture, pathRightTexture, name }) => {
         >
           <planeGeometry />
           <meshStandardMaterial map={rightFootTexture} transparent="true" />
-          <Html>Harry Potter</Html>
+          <Html wrapperClass="nameFeet">Harry Potter</Html>
         </mesh>
       </group>
     </>

@@ -1,3 +1,8 @@
+@font-face {
+    font-family: "HarryPotter";
+    src: local("HarryPotter"),
+      url("../public/assets/fonts/harry-potter.ttf") format("truetype");
+  }
 
 html,body, #root {
     position: fixed;
@@ -5,4 +10,12 @@ html,body, #root {
     left: 0;
     width: 100%;
     height: 100%;
+    background-color: #041831;
+}
+
+.nameFeet > div {
+    font-family: "HarryPotter";
+    font-size: 1rem;
+    text-align: center;
+    margin: 0.5rem;
 }
