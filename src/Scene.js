@@ -1,7 +1,8 @@
 import { Environment } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { Entrance } from "./Entrance";
+import { Entrance } from "./Title";
 import Experience from "./Experience";
+import { Leva } from "leva";
 
 export const Scene = () => {
   return (
@@ -10,12 +11,10 @@ export const Scene = () => {
         background={false}
         near={1}
         far={1000}
-        // resolution={256}
         preset="warehouse"
         orientation={[5, 100, 10]}
       ></Environment>
 
-      <Entrance />
       <Experience />
     </Canvas>
   );
