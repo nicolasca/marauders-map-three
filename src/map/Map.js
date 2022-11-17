@@ -14,9 +14,9 @@ const WIDTH_SIZE = 5;
 //   },
 // });
 
-export const Map = () => {
+export const Map = ({ handleMapOpened }) => {
   const [displayMap, setDisplayMap] = useState(false);
-  const [isOpeningOver, setOpeningOver] = useState(false);
+  const [displayHeight, setDisplayHeight] = useState(false);
   const [leftSideOpened, setLeftSideOpened] = useState(false);
   const [rightSideOpened, setRightSideOpened] = useState(false);
   const [hovered, setHovered] = useState();
@@ -39,18 +39,24 @@ export const Map = () => {
     maraudersMapCenter,
     maraudersMapLeft,
     maraudersMapRight,
+    heightLeftMap,
   ] = useLoader(TextureLoader, [
     "assets/map/map-left-visible.jpg",
     "assets/map/map-right-visible.jpg",
     "assets/map/map-center.jpg",
     "assets/map/map-left-hidden.jpg",
     "assets/map/map-right-hidden.jpg",
+    "assets/map/map-left-visible-floutix.png",
   ]);
 
   const clickMapHandler = () => {
     console.log("still here");
     planeRef.current.position.z = 0;
     setDisplayMap(true);
+  };
+
+  const makeHeightMap = () => {
+    setDisplayHeight(true);
   };
 
   useFrame((state, delta) => {
@@ -84,7 +90,15 @@ export const Map = () => {
     ) {
       planeLeftHidden.current.remove();
       planeRightHidden.current.visible = false;
-      setOpeningOver(true);
+      handleMapOpened(true);
+    }
+
+    if (
+      displayHeight &
+      (planeLeftVisible.current.material.displacementScale < 0.7)
+    ) {
+      planeLeftVisible.current.material.displacementScale += 0.005;
+      planeLeftVisible.current.material.heightScale += 0.005;
     }
   });
 
@@ -123,10 +137,15 @@ export const Map = () => {
         ref={planeLeftVisible}
         position-x={-WIDTH_SIZE}
         scale={[WIDTH_SIZE, HEIGHT_SIZE, 0.05]}
+        onClick={makeHeightMap}
       >
-        <planeGeometry />
+        <planeGeometry args={[1, 1, 200, 200]} />
         <meshStandardMaterial
           map={mapLeftVisible}
+          displacementMap={heightLeftMap}
+          bumpMap={heightLeftMap}
+          bumpScale={0}
+          displacementScale={0}
           transparent="true"
           opacity={0}
         />

@@ -31,11 +31,6 @@ export const Entrance = () => {
 
   return (
     <>
-      {/* <TransformControls mode="translate">
-        <directionalLight intensity={2} />
-      </TransformControls> */}
-
-      {/* <TransformControls mode="rotate" position-y={5}> */}
       <Center position-y={5}>
         <Text3D
           size={controls.size}
@@ -73,7 +68,6 @@ export const Entrance = () => {
           />
         </Text3D> */}
       </Center>
-      {/* </TransformControls> */}
     </>
   );
 };
