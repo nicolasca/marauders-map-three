@@ -40,6 +40,7 @@ export const Map = ({ handleMapOpened }) => {
     maraudersMapLeft,
     maraudersMapRight,
     heightLeftMap,
+    heightRightMap,
   ] = useLoader(TextureLoader, [
     "assets/map/map-left-visible.jpg",
     "assets/map/map-right-visible.jpg",
@@ -47,6 +48,7 @@ export const Map = ({ handleMapOpened }) => {
     "assets/map/map-left-hidden.jpg",
     "assets/map/map-right-hidden.jpg",
     "assets/map/map-left-visible-floutix.png",
+    "assets/map/map-right-visible-floutix.jpg",
   ]);
 
   const clickMapHandler = () => {
@@ -60,6 +62,10 @@ export const Map = ({ handleMapOpened }) => {
   };
 
   useFrame((state, delta) => {
+    if (displayMap) {
+      planeRef.current.scale.z = 0.01;
+    }
+
     // First left side animation
     if (displayMap && groupLeft.current.rotation.y > -Math.PI) {
       groupLeft.current.rotation.y -= delta * 2;
@@ -81,9 +87,6 @@ export const Map = ({ handleMapOpened }) => {
     ) {
       planeLeftVisible.current.material.opacity += delta * 0.3;
       planeRightVisible.current.material.opacity += delta * 0.3;
-
-      planeLeftHidden.current.material.opacity -= delta * 0.3;
-      planeRightHidden.current.material.opacity -= delta * 0.3;
     } else if (
       rightSideOpened & leftSideOpened &&
       planeRightVisible.current.material.opacity >= 1
@@ -95,10 +98,12 @@ export const Map = ({ handleMapOpened }) => {
 
     if (
       displayHeight &
-      (planeLeftVisible.current.material.displacementScale < 0.7)
+      (planeLeftVisible.current.material.displacementScale < 1)
     ) {
       planeLeftVisible.current.material.displacementScale += 0.005;
       planeLeftVisible.current.material.heightScale += 0.005;
+      planeRightVisible.current.material.displacementScale += 0.005;
+      planeRightVisible.current.material.heightScale += 0.005;
     }
   });
 
@@ -106,13 +111,9 @@ export const Map = ({ handleMapOpened }) => {
     <group position-y={-1}>
       <OrbitControls makeDefault />
 
-      <mesh
-        ref={planeRef}
-        scale={[WIDTH_SIZE, HEIGHT_SIZE, 0]}
-        position-z={-0.01}
-      >
+      <mesh ref={planeRef} scale={[WIDTH_SIZE, HEIGHT_SIZE, 0]}>
         <planeGeometry />
-        <meshBasicMaterial map={maraudersMapCenter} />
+        <meshStandardMaterial map={maraudersMapCenter} />
       </mesh>
       <group ref={groupLeft} position-x={-WIDTH_SIZE / 2}>
         <mesh
@@ -122,6 +123,7 @@ export const Map = ({ handleMapOpened }) => {
           ref={planeLeftHidden}
           position-x={WIDTH_SIZE / 2}
           scale={[WIDTH_SIZE, HEIGHT_SIZE, 0.01]}
+          position-z={0.01}
         >
           <planeGeometry />
           <meshStandardMaterial
@@ -160,20 +162,24 @@ export const Map = ({ handleMapOpened }) => {
           transparent="true"
         >
           <planeGeometry />
-          <meshBasicMaterial side={DoubleSide} map={maraudersMapRight} />
+          <meshStandardMaterial side={DoubleSide} map={maraudersMapRight} />
         </mesh>
       </group>
 
       <mesh
         ref={planeRightVisible}
         position-x={WIDTH_SIZE}
-        scale={[WIDTH_SIZE, HEIGHT_SIZE, 0]}
+        scale={[WIDTH_SIZE, HEIGHT_SIZE, 0.05]}
       >
-        <planeGeometry />
-        <meshBasicMaterial
+        <planeGeometry args={[1, 1, 200, 200]} />
+        <meshStandardMaterial
           map={mapRightVisible}
           transparent="true"
           opacity={0}
+          displacementMap={heightRightMap}
+          bumpMap={heightRightMap}
+          bumpScale={0}
+          displacementScale={0}
         />
       </mesh>
     </group>

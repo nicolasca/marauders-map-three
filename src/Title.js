@@ -31,6 +31,12 @@ export const Entrance = () => {
 
   return (
     <>
+      {/* <rectAreaLight
+        position={[5, 10, 2]}
+        intensity={10}
+        width={10}
+        height={3}
+      /> */}
       <Center position-y={5}>
         <Text3D
           size={controls.size}
