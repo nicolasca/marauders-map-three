@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Vector3 } from "three";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { Character } from "./Character";
-import { PivotControls, useFBX, useGLTF, useTexture } from "@react-three/drei";
+import { OrbitControls, PivotControls, PresentationControls, useFBX, useGLTF, useTexture } from "@react-three/drei";
 import { BulbLight } from "./BulbLight";
 
 export default function Experience() {
@@ -20,8 +20,14 @@ export default function Experience() {
     <>
       <EffectComposer multisampling={4}>
         {perfVisible && <Perf position="top-left" />}
+
+        <directionalLight castShadow position={[1, 2, 3]} intensity={0.1} />
+        {/* <ambientLight intensity={0.5} /> */}
+
         <Entrance />
         <Map handleMapOpened={setMapOpened} />
+        <Bloom mipmapBlur />
+
         {/* <PivotControls> */}
         <BulbLight position={bulbPosition} rotation-x={Math.PI / 2} />
         {/* </PivotControls> */}

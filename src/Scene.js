@@ -1,6 +1,8 @@
 import {
   Environment,
+  OrbitControls,
   PivotControls,
+  PresentationControls,
   Stage,
   TransformControls,
 } from "@react-three/drei";
@@ -13,36 +15,18 @@ import { Suspense } from "react";
 
 export const Scene = () => {
   return (
-    <Canvas shadows camera={{ fov: 55, near: 0.1, position: [0, 0, 25] }}>
+    <Canvas shadows camera={{ fov: 55, near: 0.1, position: [0, 5, 20] }}>
       <Suspense fallback={null}>
-        {/* <PivotControls offset={[-10, 0, 1]}>
-        <directionalLight
-          castShadow
-          color={"white"}
-          intensity={2}
-          position-z={3}
-          position-x={-3}
-          rotation-y={Math.PI / 4}
-        />
-      </PivotControls> */}
-        {/* <Environment
-        background={false}
-        near={1}
-        far={1000}
-        preset="warehouse"
-        orientation={[5, 100, 10]}
-      ></Environment> */}
-        <axesHelper args={[2, 2, 2]} />
+        {/* <axesHelper args={[2, 2, 2]} /> */}
         <color args={[new Color("#000000")]} attach="background" />
-        {/* <Stage
-          contactShadow
-          shadows
-          adjustCamera
-          intensity={1}
-          environment="park"
-          preset="rembrandt"
-        > */}
         <Experience />
+        <OrbitControls
+          minPolarAngle={Math.PI / 2 - 0.5}
+          maxPolarAngle={Math.PI - 0.5}
+          minAzimuthAngle={-Math.PI / 4}
+          maxAzimuthAngle={Math.PI / 4}
+          azimuth={[- 1, 0.75]}
+        />
         {/* </Stage> */}
       </Suspense>
     </Canvas>

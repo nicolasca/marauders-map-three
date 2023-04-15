@@ -7,13 +7,6 @@ import { TextureLoader, DoubleSide } from "three";
 const HEIGHT_SIZE = 10;
 const WIDTH_SIZE = 5;
 
-// const { position } = useControls({
-//   position: {
-//     value: { x: 0, y: 0, z: 1.3 },
-//     step: 0.01,
-//   },
-// });
-
 export const Map = ({ handleMapOpened }) => {
   const [displayMap, setDisplayMap] = useState(false);
   const [displayHeight, setDisplayHeight] = useState(false);
@@ -109,8 +102,6 @@ export const Map = ({ handleMapOpened }) => {
 
   return (
     <group position-y={-1}>
-      <OrbitControls makeDefault />
-
       <mesh ref={planeRef} scale={[WIDTH_SIZE, HEIGHT_SIZE, 0]}>
         <planeGeometry />
         <meshStandardMaterial map={maraudersMapCenter} />
@@ -135,6 +126,23 @@ export const Map = ({ handleMapOpened }) => {
         </mesh>
       </group>
 
+      <group ref={groupRight} position-x={WIDTH_SIZE / 2}>
+        <mesh
+          ref={planeRightHidden}
+          position-x={-WIDTH_SIZE / 2}
+          scale={[WIDTH_SIZE, HEIGHT_SIZE, 0.01]}
+          rotation-z={Math.PI}
+        >
+          <planeGeometry />
+          <meshStandardMaterial 
+            side={DoubleSide} 
+            map={maraudersMapRight} 
+            attach="material"
+            transparent="true"
+            />
+        </mesh>
+      </group>
+
       <mesh
         ref={planeLeftVisible}
         position-x={-WIDTH_SIZE}
@@ -150,21 +158,9 @@ export const Map = ({ handleMapOpened }) => {
           displacementScale={0}
           transparent="true"
           opacity={0}
+          side={DoubleSide}
         />
       </mesh>
-
-      <group ref={groupRight} position-x={WIDTH_SIZE / 2}>
-        <mesh
-          ref={planeRightHidden}
-          position-x={-WIDTH_SIZE / 2}
-          scale={[WIDTH_SIZE, HEIGHT_SIZE, 0]}
-          rotation-z={Math.PI}
-          transparent="true"
-        >
-          <planeGeometry />
-          <meshStandardMaterial side={DoubleSide} map={maraudersMapRight} />
-        </mesh>
-      </group>
 
       <mesh
         ref={planeRightVisible}
@@ -180,6 +176,7 @@ export const Map = ({ handleMapOpened }) => {
           bumpMap={heightRightMap}
           bumpScale={0}
           displacementScale={0}
+          side={DoubleSide}
         />
       </mesh>
     </group>
